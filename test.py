@@ -8,6 +8,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.firefox.options import Options
 
 def national_yoga_academy(driver, wait, site_key, target_date, results):
     """
@@ -30,7 +31,9 @@ def national_yoga_academy(driver, wait, site_key, target_date, results):
         })
 
 ###################
-DRIVER = webdriver.Firefox()
+OPTIONS = Options()
+OPTIONS.add_argument('-headless')
+DRIVER = webdriver.Firefox(options=OPTIONS)
 WAIT = WebDriverWait(DRIVER, 10)
 TARGET = '2020-02-07'
 RESULTS = {}
@@ -41,9 +44,7 @@ for job in JOBS:
     job_key = job['key']
     try:
         locals()[job_key](DRIVER, WAIT, job_key, TARGET, RESULTS)
-        print(' ran')
     except Exception:
-        print(' failed to run')
-        sys.stderr.write(str(Exception))
+        print(str(Exception), file=sys.stderr)
 print(json.dumps(RESULTS))
 DRIVER.quit()
