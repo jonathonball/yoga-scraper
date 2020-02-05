@@ -1,2 +1,2 @@
 # yoga-scraper
-Scrapes schedules from yoga studio websites. Print aggregated reports.
+Scrape schedules from yoga studio websites. Print aggregated report.
