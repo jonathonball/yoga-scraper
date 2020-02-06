@@ -31,6 +31,18 @@ def national_yoga_academy(driver, wait, site_key, target_date, results):
             "name": day.find_element(By.CLASS_NAME, "bw-session__name").text
         })
 
+def hot_house_yoga(driver, wait, site_key, target_date, results):
+    """
+    large schedule
+    """
+    driver.get('https://hothouseyogi.com/schedule/')
+    assert "Schedule" in driver.title
+
+    wait.until(EC.presence_of_element_located((By.ID, "start_date")))
+    driver.implicitly_wait(2) # seconds
+    driver.find_element(By.ID, "start_date").click()
+
+
 ###################
 PARSER = argparse.ArgumentParser(description="Scrape schedules from yoga studio websites")
 PARSER.add_argument('--headless', action='store_true')
@@ -44,6 +56,7 @@ TARGET = '2020-02-07'
 RESULTS = {}
 JOBS = [
     {'key': 'national_yoga_academy'},
+    {'key': 'hot_house_yoga'}
 ]
 for job in JOBS:
     job_key = job['key']
