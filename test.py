@@ -34,9 +34,9 @@ def national_yoga_academy(driver, wait, site_key, target_date, results):
 ###################
 PARSER = argparse.ArgumentParser(description="Scrape schedules from yoga studio websites")
 PARSER.add_argument('--headless', action='store_true')
-args = PARSER.parse_args()
+ARGS = PARSER.parse_args()
 OPTIONS = Options()
-if args.headless:
+if ARGS.headless:
     OPTIONS.add_argument('-headless')
 DRIVER = webdriver.Firefox(options=OPTIONS)
 WAIT = WebDriverWait(DRIVER, 10)
@@ -49,9 +49,9 @@ for job in JOBS:
     job_key = job['key']
     try:
         locals()[job_key](DRIVER, WAIT, job_key, TARGET, RESULTS)
-    except Exception as e:
-        print(type(e), file=sys.stderr)
-        print(e.args, file=sys.stderr)
-        print(e, file=sys.stderr)
+    except Exception as exception:
+        print(type(exception), file=sys.stderr)
+        print(exception.args, file=sys.stderr)
+        print(exception, file=sys.stderr)
 print(json.dumps(RESULTS))
 DRIVER.quit()
