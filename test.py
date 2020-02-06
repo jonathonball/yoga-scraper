@@ -41,14 +41,14 @@ def hot_house_yoga(driver, wait, site_key, target_date, results):
     wait.until(EC.presence_of_element_located((By.ID, "start_date")))
     driver.implicitly_wait(2) # seconds
     driver.find_element(By.ID, "start_date").click()
-
+    results[site_key] = []
 
 ###################
 PARSER = argparse.ArgumentParser(description="Scrape schedules from yoga studio websites")
-PARSER.add_argument('--headless', action='store_true')
+PARSER.add_argument('--noheadless', action='store_true')
 ARGS = PARSER.parse_args()
 OPTIONS = Options()
-if ARGS.headless:
+if not ARGS.noheadless:
     OPTIONS.add_argument('-headless')
 DRIVER = webdriver.Firefox(options=OPTIONS)
 WAIT = WebDriverWait(DRIVER, 10)
