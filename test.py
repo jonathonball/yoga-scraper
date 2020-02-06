@@ -4,6 +4,7 @@ Scrape schedules from yoga studio websites. Print aggregated report.
 """
 import sys
 import json
+import argparse
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -31,8 +32,12 @@ def national_yoga_academy(driver, wait, site_key, target_date, results):
         })
 
 ###################
+PARSER = argparse.ArgumentParser(description="Scrape schedules from yoga studio websites")
+PARSER.add_argument('--headless', action='store_true')
+args = PARSER.parse_args()
 OPTIONS = Options()
-OPTIONS.add_argument('-headless')
+if args.headless:
+    OPTIONS.add_argument('-headless')
 DRIVER = webdriver.Firefox(options=OPTIONS)
 WAIT = WebDriverWait(DRIVER, 10)
 TARGET = '2020-02-07'
@@ -44,7 +49,9 @@ for job in JOBS:
     job_key = job['key']
     try:
         locals()[job_key](DRIVER, WAIT, job_key, TARGET, RESULTS)
-    except Exception:
-        print(str(Exception), file=sys.stderr)
+    except Exception as e:
+        print(type(e), file=sys.stderr)
+        print(e.args, file=sys.stderr)
+        print(e, file=sys.stderr)
 print(json.dumps(RESULTS))
 DRIVER.quit()
