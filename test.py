@@ -5,6 +5,7 @@ Scrape schedules from yoga studio websites. Print aggregated report.
 import sys
 import json
 import argparse
+import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -35,17 +36,24 @@ def hot_house_yoga(driver, wait, site_key, target_date, results):
     """
     large schedule
     """
+    day_of_week = datetime.datetime.strptime(target_date,'%Y-%m-%d').strftime('%w')
     driver.get('https://hothouseyogi.com/schedule/')
     assert "Schedule" in driver.title
 
-    wait.until(EC.presence_of_element_located((By.ID, "start_date")))
-    driver.implicitly_wait(2) # seconds
-    driver.find_element(By.ID, "start_date").click()
+    wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'span.hc_time')))
+    classes = driver.find_elements(By.CSS_SELECTOR, "tr.hc_class[data-hc-day='" + day_of_week + "']")
     results[site_key] = []
+    for row in classes:
+        results[site_key].append({
+            "start": row.find_element(By.CLASS_NAME, "hc_starttime").text,
+            "end": row.find_element(By.CLASS_NAME, "hc_endtime").text,
+            "name": row.find_element(By.CSS_SELECTOR, ".classname > a").text[2:],
+        })
 
 ###################
 PARSER = argparse.ArgumentParser(description="Scrape schedules from yoga studio websites")
 PARSER.add_argument('--noheadless', action='store_true')
+PARSER.add_argument('--nodetach', action='store_true')
 ARGS = PARSER.parse_args()
 OPTIONS = Options()
 if not ARGS.noheadless:
@@ -67,4 +75,5 @@ for job in JOBS:
         print(exception.args, file=sys.stderr)
         print(exception, file=sys.stderr)
 print(json.dumps(RESULTS))
-DRIVER.quit()
+if not ARGS.nodetach:
+    DRIVER.quit()
