@@ -46,8 +46,8 @@ def hot_house_yoga(driver, wait, site_key, target_date, results):
     for row in classes:
         results[site_key].append({
             "start": row.find_element(By.CLASS_NAME, "hc_starttime").text,
-            "end": row.find_element(By.CLASS_NAME, "hc_endtime").text,
-            "name": row.find_element(By.CSS_SELECTOR, ".classname > a").text[2:],
+            "end": row.find_element(By.CLASS_NAME, "hc_endtime").text[2:],
+            "name": row.find_element(By.CSS_SELECTOR, ".classname > a").text,
         })
 
 ###################
