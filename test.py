@@ -50,6 +50,16 @@ def hot_house_yoga(driver, wait, site_key, target_date, results):
             "name": row.find_element(By.CSS_SELECTOR, ".classname > a").text,
         })
 
+def atma_bodha_yoga(driver, wait, site_key, target_date, results):
+    """
+    high intensity classes
+    """
+    driver.get("https://atmabodhayoga.tulasoftware.com/calendar/embed?ical=false")
+    assert "Calendar" in driver.title
+
+    wait.until(EC.presence_of_element_located((By.CLASS_NAME, "fc-content")))
+    print("loaded")
+
 ###################
 PARSER = argparse.ArgumentParser(description="Scrape schedules from yoga studio websites")
 PARSER.add_argument('--noheadless', action='store_true')
@@ -63,8 +73,9 @@ WAIT = WebDriverWait(DRIVER, 10)
 TARGET = '2020-02-07'
 RESULTS = {}
 JOBS = [
-    {'key': 'national_yoga_academy'},
-    {'key': 'hot_house_yoga'}
+    # {'key': 'national_yoga_academy'},
+    # {'key': 'hot_house_yoga'},
+    {'key': 'atma_bodha_yoga'},
 ]
 for job in JOBS:
     job_key = job['key']
