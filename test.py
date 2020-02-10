@@ -6,11 +6,13 @@ import sys
 import json
 import argparse
 import datetime
+import pytz
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.firefox.options import Options
+from icalevents.icalevents import events
 
 def national_yoga_academy(driver, wait, site_key, target_date, results):
     """
@@ -50,6 +52,24 @@ def hot_house_yoga(driver, wait, site_key, target_date, results):
             "name": row.find_element(By.CSS_SELECTOR, ".classname > a").text,
         })
 
+def atma_bodha_yoga(driver, wait, site_key, target_date, results):
+    """
+    high intensity classes
+    """
+    sessions = events("http://atmabodhayoga.tulasoftware.com/calendar/feed.ics", fix_apple=True)
+    results[site_key] = []
+    eastern_timezone = pytz.timezone("US/Eastern")
+    date_format = "%Y-%m-%d"
+    time_format = date_format +" %H:%M:%S"
+    for session in sessions:
+        date = session.start.astimezone(eastern_timezone).strftime(date_format)
+        if (date == target_date):
+            results[site_key].append({
+                "start": session.start.astimezone(eastern_timezone).strftime(time_format),
+                "end": session.end.astimezone(eastern_timezone).strftime(time_format),
+                "name": session.summary,
+            })
+
 ###################
 PARSER = argparse.ArgumentParser(description="Scrape schedules from yoga studio websites")
 PARSER.add_argument('--noheadless', action='store_true')
@@ -60,12 +80,14 @@ if not ARGS.noheadless:
     OPTIONS.add_argument('-headless')
 DRIVER = webdriver.Firefox(options=OPTIONS)
 WAIT = WebDriverWait(DRIVER, 10)
-TARGET = '2020-02-07'
+TARGET = '2020-02-12'
 RESULTS = {}
 JOBS = [
     {'key': 'national_yoga_academy'},
-    {'key': 'hot_house_yoga'}
+    {'key': 'hot_house_yoga'},
+    {'key': 'atma_bodha_yoga'},
 ]
+
 for job in JOBS:
     job_key = job['key']
     try:
@@ -75,5 +97,6 @@ for job in JOBS:
         print(exception.args, file=sys.stderr)
         print(exception, file=sys.stderr)
 print(json.dumps(RESULTS))
+
 if not ARGS.nodetach:
     DRIVER.quit()
