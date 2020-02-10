@@ -14,6 +14,13 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.firefox.options import Options
 from icalevents.icalevents import events
 
+def valid_date(date):
+    try:
+        return datetime.datetime.strptime(date, "%Y-%m-%d").strftime("%Y-%m-%d")
+    except ValueError:
+        msg = "Not a valid date: '{0}'.".format(date)
+        raise argparse.ArgumentTypeError(msg)
+
 def national_yoga_academy(driver, wait, site_key, target_date, results):
     """
     home sweet home
@@ -72,15 +79,15 @@ def atma_bodha_yoga(driver, wait, site_key, target_date, results):
 
 ###################
 PARSER = argparse.ArgumentParser(description="Scrape schedules from yoga studio websites")
-PARSER.add_argument('--noheadless', action='store_true')
-PARSER.add_argument('--nodetach', action='store_true')
+PARSER.add_argument('--noheadless', help="Prevent hiding of test browser", action='store_true')
+PARSER.add_argument('--nodetach', help="Leave test browser running", action='store_true')
+PARSER.add_argument('date', help="YYYY-MM-DD to search for classes", type=valid_date)
 ARGS = PARSER.parse_args()
 OPTIONS = Options()
 if not ARGS.noheadless:
     OPTIONS.add_argument('-headless')
 DRIVER = webdriver.Firefox(options=OPTIONS)
 WAIT = WebDriverWait(DRIVER, 10)
-TARGET = '2020-02-12'
 RESULTS = {}
 JOBS = [
     {'key': 'national_yoga_academy'},
@@ -91,7 +98,7 @@ JOBS = [
 for job in JOBS:
     job_key = job['key']
     try:
-        locals()[job_key](DRIVER, WAIT, job_key, TARGET, RESULTS)
+        locals()[job_key](DRIVER, WAIT, job_key, ARGS.date, RESULTS)
     except Exception as exception:
         print(type(exception), file=sys.stderr)
         print(exception.args, file=sys.stderr)
